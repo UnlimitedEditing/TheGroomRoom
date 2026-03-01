@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Groom Room</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sand:    #c8b9a5;
+      --sand-lt: #e8ddd2;
+      --sand-dk: #b0a090;
+      --char:    #2f2e2b;
+      --char-lt: #4a4845;
+      --cream:   #f5f0ea;
+      --white:   #fdfcfa;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--white);
+      color: var(--char);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.4rem 3rem;
+      background: rgba(253,252,250,0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(200,185,165,0.3);
+      transition: padding 0.3s ease;
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.35em;
+      font-weight: 500;
+      text-transform: uppercase;
+      color: var(--char);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--char-lt);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--char); }
+
+    .nav-book {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      background: var(--char);
+      color: var(--white) !important;
+      padding: 0.6rem 1.4rem !important;
+      transition: background 0.2s !important;
+    }
+
+    .nav-book:hover { background: var(--char-lt) !important; color: var(--white) !important; }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 1.5px;
+      background: var(--char);
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--white);
+      z-index: 99;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .mobile-menu.open { display: flex; opacity: 1; }
+
+    .mobile-menu a {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      font-weight: 400;
+      color: var(--char);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+    }
+
+    .mobile-close {
+      position: absolute;
+      top: 1.4rem; right: 1.8rem;
+      font-size: 1.6rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--char);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      background: var(--cream);
+      position: relative;
+      overflow: hidden;
+      padding: 7rem 2rem 4rem;
+    }
+
+    .hero-bg-circle {
+      position: absolute;
+      width: min(90vw, 700px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, var(--sand-lt), var(--sand-dk));
+      opacity: 0.35;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: breathe 8s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.04); }
+    }
+
+    .hero-content { position: relative; z-index: 2; }
+
+    .hero-logo-ring {
+      width: clamp(100px, 18vw, 160px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--sand);
+      border: 1.5px solid var(--sand-dk);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 2.5rem;
+      animation: fadeUp 0.9s ease both;
+      box-shadow: 0 20px 60px rgba(47,46,43,0.12);
+    }
+
+    .hero-logo-ring span {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      font-weight: 500;
+      color: var(--char);
+      letter-spacing: 0.04em;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.68rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--sand-dk);
+      margin-bottom: 1.2rem;
+      animation: fadeUp 0.9s 0.15s ease both;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 9vw, 7rem);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      color: var(--char);
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.9s 0.25s ease both;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--sand-dk);
+    }
+
+    .hero-sub {
+      font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+      letter-spacing: 0.12em;
+      color: var(--char-lt);
+      margin-bottom: 2.8rem;
+      animation: fadeUp 0.9s 0.35s ease both;
+      text-transform: uppercase;
+    }
+
+    .hero-cta {
+      display: inline-block;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--white);
+      background: var(--char);
+      padding: 1rem 2.8rem;
+      transition: all 0.3s ease;
+      animation: fadeUp 0.9s 0.45s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-cta::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--sand);
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.4s ease;
+      z-index: -1;
+    }
+
+    .hero-cta:hover { color: var(--char); }
+    .hero-cta:hover::after { transform: scaleX(1); transform-origin: left; }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      animation: fadeUp 0.9s 0.6s ease both;
+    }
+
+    .hero-scroll span {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--sand-dk);
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--sand-dk), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── SECTION COMMONS ── */
+    section { padding: 7rem 2rem; }
+
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--sand-dk);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 300;
+      line-height: 1.1;
+      color: var(--char);
+      margin-bottom: 2.5rem;
+    }
+
+    .section-title em { font-style: italic; color: var(--sand-dk); }
+
+    .divider {
+      width: 40px;
+      height: 1px;
+      background: var(--sand);
+      margin-bottom: 2.5rem;
+    }
+
+    /* ── SERVICES ── */
+    #services { background: var(--white); }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5px;
+      background: var(--sand-lt);
+      border: 1.5px solid var(--sand-lt);
+      margin-top: 3rem;
+    }
+
+    .service-card {
+      background: var(--white);
+      padding: 2.5rem 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s ease;
+      cursor: default;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--sand);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+
+    .service-card:hover { background: var(--cream); }
+    .service-card:hover::before { transform: scaleX(1); }
+
+    .service-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem;
+      font-weight: 300;
+      color: var(--sand-lt);
+      line-height: 1;
+      margin-bottom: 1rem;
+      user-select: none;
+    }
+
+    .service-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: var(--char);
+      margin-bottom: 0.7rem;
+    }
+
+    .service-desc {
+      font-size: 0.82rem;
+      line-height: 1.75;
+      color: var(--char-lt);
+      letter-spacing: 0.02em;
+    }
+
+    /* ── BOOKING BANNER ── */
+    .booking-banner {
+      background: var(--char);
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+
+    .booking-banner p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 300;
+      color: var(--sand-lt);
+      margin-bottom: 2rem;
+      font-style: italic;
+    }
+
+    .booking-banner a {
+      display: inline-block;
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--char);
+      background: var(--sand);
+      text-decoration: none;
+      padding: 1rem 3rem;
+      transition: all 0.3s ease;
+    }
+
+    .booking-banner a:hover {
+      background: var(--sand-lt);
+    }
+
+    /* ── ABOUT ── */
+    #about { background: var(--cream); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    .about-body {
+      font-size: 0.92rem;
+      line-height: 2;
+      color: var(--char-lt);
+    }
+
+    .about-body p + p { margin-top: 1.2rem; }
+
+    .about-aside {
+      padding: 3rem 2.5rem;
+      border: 1px solid var(--sand);
+      background: var(--white);
+      position: relative;
+    }
+
+    .about-aside::before {
+      content: '"';
+      position: absolute;
+      top: -1rem;
+      left: 2rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem;
+      color: var(--sand);
+      line-height: 1;
+    }
+
+    .about-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-style: italic;
+      font-weight: 300;
+      color: var(--char);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .about-attr {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--sand-dk);
+    }
+
+    /* ── CONTACT / FOOTER ── */
+    footer {
+      background: var(--char);
+      color: var(--sand-lt);
+      padding: 4rem 2rem 2rem;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 3rem;
+      align-items: start;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid rgba(200,185,165,0.2);
+    }
+
+    .footer-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.8rem;
+    }
+
+    .footer-tag {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--sand-dk);
+    }
+
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      text-align: right;
+    }
+
+    .footer-links a {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--sand-lt);
+      text-decoration: none;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .footer-links a:hover { opacity: 1; }
+
+    .footer-bottom {
+      max-width: 1100px;
+      margin: 2rem auto 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: rgba(200,185,165,0.4);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+
+      section { padding: 5rem 1.5rem; }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+
+      .footer-inner {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .footer-links { text-align: left; }
+      .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">The Groom Room</a>
+    <ul class="nav-links">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="https://thegroomroom.co.za/booking" target="_blank" rel="noopener" class="nav-book">Book Now</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-close" id="mobileClose">✕</button>
+    <a href="#services" onclick="closeMenu()">Services</a>
+    <a href="#about" onclick="closeMenu()">About</a>
+    <a href="https://thegroomroom.co.za/booking" target="_blank" rel="noopener">Book Now</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-bg-circle"></div>
+    <div class="hero-content">
+      <div class="hero-logo-ring"><span>TGR</span></div>
+      <p class="hero-eyebrow">Where refinement meets routine</p>
+      <h1 class="hero-title">The Groom<br><em>Room</em></h1>
+      <p class="hero-sub">Professional Grooming &amp; Beauty Services</p>
+      <a href="https://thegroomroom.co.za/booking" target="_blank" rel="noopener" class="hero-cta">Reserve Your Appointment</a>
+    </div>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="section-inner">
+      <p class="section-label">What We Offer</p>
+      <h2 class="section-title">Our <em>Services</em></h2>
+      <div class="divider"></div>
+      <p style="max-width:520px; font-size:0.88rem; line-height:1.9; color:var(--char-lt);">
+        Every visit is a moment to reset. Our team delivers attentive, personalised grooming experiences tailored to you — because the details are everything.
+      </p>
+
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-num">01</div>
+          <div class="service-name">Hair &amp; Styling</div>
+          <p class="service-desc">Cuts, blowouts, and styling treatments crafted to complement your features and your lifestyle.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-num">02</div>
+          <div class="service-name">Brows &amp; Lashes</div>
+          <p class="service-desc">Precision shaping, tinting, and lash services that frame your face with intention.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-num">03</div>
+          <div class="service-name">Nails</div>
+          <p class="service-desc">Manicures, pedicures, and nail artistry — hands and feet that look as polished as the rest of you.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-num">04</div>
+          <div class="service-name">Skin Treatments</div>
+          <p class="service-desc">Facials and skin care rituals designed to restore, refresh, and genuinely improve your complexion.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-num">05</div>
+          <div class="service-name">Waxing</div>
+          <p class="service-desc">Efficient, thorough, and as pleasant as the process can reasonably be made to be.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-num">06</div>
+          <div class="service-name">Packages</div>
+          <p class="service-desc">Combine services for a full experience. Because sometimes you need all of it in one sitting.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING BANNER -->
+  <div class="booking-banner">
+    <p>Ready to be looked after properly?</p>
+    <a href="https://thegroomroom.co.za/booking" target="_blank" rel="noopener">Book Online</a>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-inner">
+      <p class="section-label">Our Story</p>
+      <h2 class="section-title">About <em>Us</em></h2>
+      <div class="divider"></div>
+
+      <div class="about-grid">
+        <div class="about-body">
+          <p>
+            The Groom Room is a grooming studio committed to making you look — and presumably feel — like the best version of yourself. We offer services. Beauty services, specifically, of the kind one would seek out at an establishment such as this one.
+          </p>
+          <p>
+            Our team is experienced, detail-oriented, and fully aware of what a good appointment should feel like. We have been doing this for some time, in a space that is calm, clean, and designed to make the whole process feel rather less like an errand and rather more like a small luxury.
+          </p>
+          <p>
+            We're based in South Africa, which is a place we're very fond of. Our clients tend to return, which is generally considered a positive sign in this industry. We take pride in our work, which again, we'd be happy to describe in more detail if the information were forthcoming.
+          </p>
+          <p>
+            In the meantime: we groom people. We do it well. You should book an appointment.
+          </p>
+        </div>
+
+        <div class="about-aside">
+          <p class="about-quote">We can't promise perfection. But we can promise that you'll leave looking significantly more put-together than when you arrived.</p>
+          <span class="about-attr">— The Groom Room, probably</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="contact">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">The Groom Room</div>
+        <p class="footer-tag">South Africa &nbsp;·&nbsp; Grooming &amp; Beauty</p>
+      </div>
+      <div class="footer-links">
+        <a href="#home">Home</a>
+        <a href="#services">Services</a>
+        <a href="#about">About</a>
+        <a href="https://thegroomroom.co.za/booking" target="_blank" rel="noopener">Book Now</a>
+        <a href="https://thegroomroom.co.za" target="_blank" rel="noopener">Visit Original Site</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 The Groom Room</span>
+      <span>All rights reserved</span>
+    </div>
+  </footer>
+
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileClose = document.getElementById('mobileClose');
+
+    hamburger.addEventListener('click', () => {
+      mobileMenu.classList.add('open');
+    });
+
+    mobileClose.addEventListener('click', closeMenu);
+
+    function closeMenu() {
+      mobileMenu.classList.remove('open');
+    }
+  </script>
+</body>
+</html>
